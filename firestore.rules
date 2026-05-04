@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isGlobalAdmin() {
+      return isSignedIn() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isGlobalAdmin());
+      allow list: if isSignedIn(); // Necessary for looking up users by email for invites
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && (request.auth.uid == userId || isGlobalAdmin());
+    }
+
+    // Activity Logs
+    match /logs/{logId} {
+      allow create: if isSignedIn();
+      allow read: if isGlobalAdmin();
+    }
+
+    // Projects collection
+    match /projects/{projectId} {
+      function canReadProject() {
+        return isSignedIn() && (isGlobalAdmin() || resource.data.members[request.auth.uid] != null);
+      }
+      function canWriteProject() {
+        return isSignedIn() && (isGlobalAdmin() || resource.data.members[request.auth.uid] == 'admin');
+      }
+
+      allow get, list: if canReadProject();
+      allow create: if isSignedIn();
+      allow update, delete: if canWriteProject();
+
+      function getParentProject() {
+        return get(/databases/$(database)/documents/projects/$(projectId)).data;
+      }
+      function canReadSub() {
+        let members = getParentProject().members;
+        return isSignedIn() && (isGlobalAdmin() || members[request.auth.uid] != null);
+      }
+      function canWriteSub() {
+        let members = getParentProject().members;
+        return isSignedIn() && (isGlobalAdmin() || members[request.auth.uid] in ['admin', 'editor']);
+      }
+
+      // Links subcollection
+      match /links/{linkId} {
+        allow read: if canReadSub();
+        allow create: if canWriteSub();
+        allow update, delete: if canWriteSub();
+      }
+
+      // Credentials subcollection
+      match /credentials/{credentialId} {
+        allow read: if canReadSub();
+        allow create: if canWriteSub();
+        allow update, delete: if canWriteSub();
+      }
+
+      // Notes subcollection
+      match /notes/{noteId} {
+        allow read: if canReadSub();
+        allow create: if canWriteSub();
+        allow update, delete: if canWriteSub();
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-brand-primary: #F4F4F5; /* zinc-100/200 */
+  --color-brand-secondary: #A1A1AA; /* zinc-400 */
+  --color-brand-muted: #52525B; /* zinc-600 */
+  --color-brand-accent: #6366F1; /* indigo-500 */
+  --color-brand-bg: #09090B; /* zinc-950 */
+  --color-brand-surface: #121214; /* refined surface */
+  --color-brand-border: #27272A; /* zinc-800 */
+
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+
+  --shadow-glow: 0 0 15px -3px rgba(99, 102, 241, 0.3);
+  --shadow-inner-glow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-primary font-sans antialiased selection:bg-indigo-500/30;
+  }
+}
+
+@layer components {
+  .premium-card {
+    @apply bg-brand-surface border border-brand-border rounded-xl shadow-inner-glow transition-all duration-300;
+  }
+
+  .premium-card-hover {
+    @apply hover:border-zinc-700 hover:shadow-glow;
+  }
+
+  .premium-input {
+    @apply bg-zinc-950/50 border border-brand-border text-zinc-100 rounded-lg px-4 py-2.5 text-sm transition-all
+           focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 placeholder:text-zinc-600;
+  }
+
+  .badge-base {
+    @apply text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-sm;
+  }
+
+  .badge-env-prod { @apply bg-red-500/10 text-red-400 border border-red-500/20; }
+  .badge-env-staging { @apply bg-amber-500/10 text-amber-400 border border-amber-500/20; }
+  .badge-env-dev { @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-zinc-800 rounded-full hover:bg-zinc-700;
+}

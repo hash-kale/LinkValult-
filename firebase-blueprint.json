@@ -1,0 +1,104 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Team member profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "member"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "A container for links, credentials, and notes",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "members": { "type": "object", "description": "Map of uid to role: admin, editor, viewer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "ownerId"]
+    },
+    "Link": {
+      "title": "Link",
+      "description": "Resource link",
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "url": { "type": "string" },
+        "category": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "environment": { "type": "string", "enum": ["production", "staging", "dev"] },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "title", "url", "environment"]
+    },
+    "Credential": {
+      "title": "Credential",
+      "description": "Encrypted credential",
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "serviceName": { "type": "string" },
+        "username": { "type": "string" },
+        "encryptedPassword": { "type": "string" },
+        "salt": { "type": "string" },
+        "iv": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "environment": { "type": "string", "enum": ["production", "staging", "dev"] },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "serviceName", "encryptedPassword", "environment"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "Project note",
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "environment": { "type": "string", "enum": ["production", "staging", "dev"] },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "ActivityLog": {
+      "title": "Activity Log",
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "userId": { "type": "string" },
+        "action": { "type": "string" },
+        "resourceType": { "type": "string" },
+        "resourceId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "User",
+      "description": "Team members"
+    },
+    "projects": {
+      "schema": "Project",
+      "description": "Resource containers"
+    },
+    "projects/{projectId}/links": { "schema": "Link" },
+    "projects/{projectId}/credentials": { "schema": "Credential" },
+    "projects/{projectId}/notes": { "schema": "Note" },
+    "logs": { "schema": "ActivityLog" }
+  }
+}
